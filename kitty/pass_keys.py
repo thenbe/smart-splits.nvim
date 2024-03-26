@@ -80,6 +80,20 @@ def relative_resize_window(direction, amount, target_window_id, boss):
         boss.active_tab.resize_window('taller', amount)
 
 
+def handle_neighboring_window(direction, boss):
+    original_id = boss.active_tab.active_window.id
+    boss.active_tab.neighboring_window(direction)
+    new_id = boss.active_tab.active_window.id
+    # check if we moved, if we haven't moved then we're at the edge
+    is_at_edge = original_id == new_id
+    if is_at_edge:
+        # now attempt to focus neighboring awesomewm client
+        # command = "awesome-client 'require(\"awful\").client.focus.global_bydirection(\"{}\")'".format(direction)
+        command = "awesome-client 'focus_bydirection(\"{}\")'".format(direction)
+        import subprocess
+        subprocess.run(command, shell=True)
+
+
 def main():
     pass
 
@@ -101,6 +115,6 @@ def handle_result(args, result, target_window_id, boss):
             encoded = encode_key_mapping(window, keymap)
             window.write_to_child(encoded)
     elif action == 'neighboring_window':
-        boss.active_tab.neighboring_window(direction)
+        handle_neighboring_window(direction, boss)
     elif action == 'relative_resize':
         relative_resize_window(direction, amount, target_window_id, boss)
